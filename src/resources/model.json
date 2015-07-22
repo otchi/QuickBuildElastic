@@ -1,0 +1,50 @@
+    {
+        _mapping:{  
+            host:"http://localhost:9200",
+            index:{
+                "index1":["type1"]
+            },
+              request:{
+                    class:"com.edifixio.amine.testBean.MyRequest",
+                    alias:{
+                        match:"query::filtred::query::match",
+                        QMcompany:"$$match::query"
+                    },
+
+                    mapping:{
+                        QMcompany:["mainRequest"]
+                    }
+                },
+
+                response:{
+                    class:"com.edifixio.amine.testBean.MyResponse",
+                    alias:{
+                        response:"hits::hits::_source",
+                        mylat:"$$response::mylat"
+                    },
+                    mapping:{
+                        mylat:"latitude"
+                    }
+                }
+            },
+
+     _query:{       
+             "query": {
+            "filtered": {
+              "query": {
+                "match": {
+                  "name": "??"
+                }
+              },
+              "filter": {}
+            }
+          },"aggs": {
+            "cyl": {
+              "terms": {
+                "field": "model",
+                "size": 10
+              }
+            }
+          }
+        }
+    }
