@@ -5,7 +5,7 @@
                 "index1":["type1"]
             },
               request:{
-                    class:"com.edifixio.amine.MyRequest",
+                    class:"com.edifixio.amine.testBean.MyRequest",
                     alias:{
                         match:"query::filtred::query::match",
                         QMcompany:"$$match::query"
@@ -17,7 +17,7 @@
                 },
 
                 response:{
-                    class:"com.edifixio.amine.MyResponce",
+                    class:"com.edifixio.amine.testBean.MyResponse",
                     alias:{
                         response:"hits::hits::_source",
                         mylat:"$$response::mylat"
@@ -33,7 +33,7 @@
             "filtered": {
               "query": {
                 "match": {
-                  "name": "chevrolet"
+                  "name": "??"
                 }
               },
               "filter": {}

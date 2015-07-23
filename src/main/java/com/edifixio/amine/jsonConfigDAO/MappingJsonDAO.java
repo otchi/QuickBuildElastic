@@ -2,25 +2,31 @@ package com.edifixio.amine.jsonConfigDAO;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import com.edifixio.amine.config.Mapping;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-public abstract class JsonConfDAO<Type extends HashMap<String, ?>> {
+public abstract class MappingJsonDAO<Type> extends ConfigJsonDAO<Mapping<Type>> {
 
-	protected JsonObject jo;
+	public MappingJsonDAO(JsonObject jo) {
+		super(jo);
+		// TODO Auto-generated constructor stub
+	}
+	
 
-	public JsonConfDAO(JsonObject jo) {
-		
-		this.jo = jo;
+	public Mapping<Type> getMapping() throws ClassNotFoundException{	
+		Mapping<Type> mapping=new Mapping<Type>();
+		mapping.setClasse(Class.forName(jo.get("class").getAsString()));
+		mapping.setAlias(aliasDecoder(jo.get("alias").getAsJsonObject()));
+		return mapping;
 	}
 
-	public abstract Type getMapping() throws ClassNotFoundException;
-
-	protected static void aliasDecoder(JsonObject aliasObject) {
+	protected static Map<String, String> aliasDecoder(JsonObject aliasObject) {
 		Set<Entry<String, JsonElement>> set = aliasObject.entrySet();
 		Iterator<Entry<String, JsonElement>> iter = set.iterator();
 
@@ -32,6 +38,14 @@ public abstract class JsonConfDAO<Type extends HashMap<String, ?>> {
 			System.out.println(element.getKey() + ":" + proprety);
 			aliasObject.add(element.getKey(), new JsonParser().parse("\"" + proprety + "\""));
 		}
+		
+		Map<String, String> alias=new HashMap<String, String>();
+		iter=set.iterator();
+		while(iter.hasNext()){
+			Entry<String, JsonElement> element = iter.next();
+			alias.put(element.getKey(), element.getValue().getAsString());
+		}
+		return alias;
 	}
 
 	private static String recurciveAliasDecoder(String[] values, JsonObject aliasObject) {
