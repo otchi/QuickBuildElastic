@@ -3,15 +3,15 @@ package com.edifixio.amine.jsonConfigDAO;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import com.edifixio.amine.config.ElasticSetting;
-import com.edifixio.jsonFastBuild.selector.UtilesSelector;
+import com.edifixio.amine.controller.Couple;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
@@ -30,13 +30,15 @@ public class ElasticSettingJsonDAO extends ConfigJsonDAO<ElasticSetting>{
 	public ElasticSetting getMapping() throws ClassNotFoundException{
 		// TODO Auto-generated method stub
 	
+		ElasticSetting elasticSetting = new ElasticSetting();
+		Set<Couple<String, List<String>>>  indexes=elasticSetting.getConfig();
 		
 		Set<Entry<String, JsonElement>> jsonSet=jo.get("index")
 													.getAsJsonObject()
 													.entrySet();
 		Iterator<Entry<String, JsonElement>> indexSetIter =jsonSet.iterator();
-		HashMap<String,List<String>> indexes=new HashMap<String, List<String>>();
 		List<String> listeOfType;
+		
 		while(indexSetIter.hasNext()){
 			Entry<String, JsonElement> index=indexSetIter.next();
 			listeOfType=new ArrayList<String>();
@@ -44,13 +46,19 @@ public class ElasticSettingJsonDAO extends ConfigJsonDAO<ElasticSetting>{
 			for(int i=0;i<jsa.size();i++){
 				listeOfType.add(jsa.get(i).getAsString());
 			}
-			indexes.put(index.getKey(), listeOfType);
+			indexes.add(new Couple<String, List<String>>(index.getKey(), listeOfType));
 			
 		}
-		ElasticSetting elasticSetting = new ElasticSetting();
+		
+		JsonArray jsa=jo.get("facets").getAsJsonArray();
+		for(int i=0;i<jsa.size();i++){
+			elasticSetting.getFacets().add(jsa.get(i).getAsString());
+		}
+		
 		elasticSetting.setHost(jo.get("host").getAsString());
-		elasticSetting.putAll(indexes);
-		System.out.println(elasticSetting+"----"+elasticSetting.getHost());
+		System.out.println(elasticSetting.getFacets()+
+					"----"+elasticSetting.getHost()
+					+"----"+elasticSetting.getConfig());
 		
 		return elasticSetting;
 	}
@@ -60,9 +68,13 @@ public class ElasticSettingJsonDAO extends ConfigJsonDAO<ElasticSetting>{
 		JsonParser jsonParser = new JsonParser();
 		JsonObject jo = jsonParser
 				.parse(new FileReader(
-						new File("/home/amine/workspace/" + "QuickBuildElastic/src/" + "resources/model.json")))
+						new File("/home/amine/workspace/" 
+								+ "QuickBuildElastic/src/" 
+								+ "resources/model.json")))
 				.getAsJsonObject();
 		new ElasticSettingJsonDAO(jo).getMapping();
 
 	}
 }
+
+

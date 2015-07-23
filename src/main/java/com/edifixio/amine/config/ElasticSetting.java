@@ -1,10 +1,20 @@
 package com.edifixio.amine.config;
 
+import java.util.LinkedList;
 import java.util.List;
 
-@SuppressWarnings("serial")
 public class ElasticSetting extends Config<List<String>>{
+	
 	private String host;
+	private List<String> facets=new LinkedList<String>();
+
+	public List<String> getFacets() {
+		return facets;
+	}
+
+	public void setFacets(List<String> facets) {
+		this.facets = facets;
+	}
 
 	public String getHost() {
 		return host;

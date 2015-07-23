@@ -2,49 +2,62 @@
         _mapping:{  
             host:"http://localhost:9200",
             index:{
-                "index1":["type1"]
-            },
-              request:{
-                    class:"com.edifixio.amine.testBean.MyRequest",
-                    alias:{
-                        match:"query::filtred::query::match",
-                        QMcompany:"$$match::query"
-                    },
-
-                    mapping:{
-                        QMcompany:["mainRequest"]
-                    }
+                    "index1":["type1"]
                 },
-
-                response:{
-                    class:"com.edifixio.amine.testBean.MyResponse",
-                    alias:{
-                        response:"hits::hits::_source",
-                        mylat:"$$response::mylat"
-                    },
-                    mapping:{
-                        mylat:"latitude"
-                    }
+            
+            request:{
+                class:"com.edifixio.amine.testBean.MyRequest",
+                alias:{
+                    query:"query::filtred::query",
+                    voiture:"$$query::term::voiture::values"
+                },
+                mapping:{
+                    voiture:["mainSearch"]
+                        }
+            },
+            
+            response:{
+                class:"com.edifixio.amine.testBean.MyResponse",
+                alias:{
+                    response:"hits::hits::_source",
+                    voiture:"$$response::voiture"
+                },
+                mapping:{
+                    voiture:"voiture"
                 }
             },
-
-     _query:{       
-             "query": {
-            "filtered": {
-              "query": {
-                "match": {
-                  "name": "??"
+            facets:[ "test"
+            ]
+        },
+        
+        
+        _query:{
+             "query":  
+                {"filtered":{
+                    "query": {
+                        "term": {
+                            "voiture": {
+                                "value": "??"
+                            }
+                        }
+                    },
+                    "filter":{
+                        "term": {
+                            "cylendres": "??"
+                            }
+                        }
+                    }
                 }
-              },
-              "filter": {}
+            
+        , "size": 40
+            
+        ,"aggs": {
+            "test": {
+                "terms": {
+                    "field": "cylendres",
+                    "size": 10
+                }
             }
-          },"aggs": {
-            "cyl": {
-              "terms": {
-                "field": "model",
-                "size": 10
-              }
-            }
-          }
         }
     }
+}

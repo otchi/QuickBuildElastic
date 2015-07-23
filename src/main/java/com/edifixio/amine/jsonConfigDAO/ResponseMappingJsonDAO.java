@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import com.edifixio.amine.config.ResponseMapping;
+import com.edifixio.amine.controller.Couple;
 import com.edifixio.jsonFastBuild.selector.UtilesSelector;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
@@ -32,12 +33,13 @@ public class ResponseMappingJsonDAO extends MappingJsonDAO<String>{
 		Iterator<Entry<String, JsonElement>> mappingIter = mapping.iterator();
 		ResponseMapping rm=new ResponseMapping();	
 		rm.setAlias(super.getMapping().getAlias());
+		rm.setMapClass(super.getMapping().getMapClass());
 		while (mappingIter.hasNext()) {
 			Entry<String, JsonElement> element = mappingIter.next();
-			rm.put(element.getKey(), element.getValue().getAsString());
+			rm.getConfig().add(new Couple<String, String>(element.getKey(), element.getValue().getAsString()));
 		}
 
-		 System.out.println(rm+"----"+rm.getAlias());
+		 System.out.println(rm.getConfig()+"----"+rm.getAlias());
 
 		return rm;
 	}

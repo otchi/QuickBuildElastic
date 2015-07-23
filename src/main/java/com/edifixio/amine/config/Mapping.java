@@ -8,7 +8,7 @@ public class  Mapping<Type> extends Config<Type> {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	private Class<?> classe;
+	private Class<?> mapClass;
 	private Map<String,String> alias;
 	
 	public Map<String, String> getAlias() {
@@ -20,11 +20,11 @@ public class  Mapping<Type> extends Config<Type> {
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
-	public Class<?> getClasse() {
-		return classe;
+	public Class<?> getMapClass() {
+		return mapClass;
 	}
-	public void setClasse(Class<?> classe) {
-		this.classe = classe;
+	public void setMapClass(Class<?> mapClass) {
+		this.mapClass = mapClass;
 	}
 
 

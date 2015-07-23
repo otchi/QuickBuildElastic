@@ -21,7 +21,8 @@ public abstract class MappingJsonDAO<Type> extends ConfigJsonDAO<Mapping<Type>> 
 
 	public Mapping<Type> getMapping() throws ClassNotFoundException{	
 		Mapping<Type> mapping=new Mapping<Type>();
-		mapping.setClasse(Class.forName(jo.get("class").getAsString()));
+		mapping.setMapClass((Class.forName(jo.get("class").getAsString())));
+		System.out.println(mapping.getMapClass());
 		mapping.setAlias(aliasDecoder(jo.get("alias").getAsJsonObject()));
 		return mapping;
 	}

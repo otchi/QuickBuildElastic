@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import com.edifixio.amine.config.QueryMapping;
+import com.edifixio.amine.controller.Couple;
 import com.edifixio.jsonFastBuild.selector.UtilesSelector;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -32,6 +33,7 @@ public class QueryMappingJsonDAO extends MappingJsonDAO<List<String>> {
 		Iterator<Entry<String, JsonElement>> mappingIter = mapping.iterator();
 		QueryMapping qm = new QueryMapping();
 		qm.setAlias(super.getMapping().getAlias());
+		qm.setMapClass(super.getMapping().getMapClass());
 		while (mappingIter.hasNext()) {
 			Entry<String, JsonElement> element = mappingIter.next();
 			List<String> list=new ArrayList<String>();
@@ -41,10 +43,10 @@ public class QueryMappingJsonDAO extends MappingJsonDAO<List<String>> {
 				list.add(jsonArray.get(i).getAsString());
 			}
 			
-			qm.put(element.getKey(), list);
+			qm.getConfig().add((new Couple<String, List<String>>(element.getKey(), list)));
 		
 		}
-		System.out.println(qm+"+++"+qm.getAlias());
+		System.out.println("!!!!++++"+qm.getConfig()+"+++"+qm.getAlias()+"++!!!!+\n"+qm.getMapClass());
 		return qm;
 
 		// TODO Auto-generated method stub
