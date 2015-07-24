@@ -17,15 +17,13 @@
             },
             
             response:{
-                class:"com.edifixio.amine.testBean.MyResponse",
-                alias:{
-                    response:"hits::hits::_source"
-                },
-                mapping:{
-                    voiture:"$$response::voiture"
+                _meta:{
+                    class:"com.edifixio.amine.testBean.MyResponse",
+                    alias:{},
+                    mapping:{}
                 },
                  _source:{
-                       $$proprety:""
+                       $$class:""
                 }
             },
              facets:[ "test"]
