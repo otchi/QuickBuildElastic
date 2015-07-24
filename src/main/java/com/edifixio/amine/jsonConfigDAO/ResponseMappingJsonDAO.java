@@ -18,6 +18,7 @@ import com.google.gson.JsonSyntaxException;
 
 public class ResponseMappingJsonDAO extends MappingJsonDAO<String>{
 
+
 	public ResponseMappingJsonDAO(JsonObject jo) {
 		super(UtilesSelector.selection("_mapping::response", jo).getAsJsonObject());
 		// TODO Auto-generated constructor stub
@@ -38,11 +39,26 @@ public class ResponseMappingJsonDAO extends MappingJsonDAO<String>{
 			Entry<String, JsonElement> element = mappingIter.next();
 			rm.getConfig().add(new Couple<String, String>(element.getKey(), element.getValue().getAsString()));
 		}
+		
+		Set<Entry<String, JsonElement>> source= jo.get("_source")
+											.getAsJsonObject().entrySet();
+		Iterator<Entry<String, JsonElement>> sourceIter = source.iterator();
+		while(sourceIter.hasNext()){
+			Entry<String, JsonElement> element=sourceIter.next();
+			rm.getSourceMapping().add(new Couple<String, String>(element.getKey(),
+										element.getValue().getAsString()));
+		}
+		
 
 		 System.out.println(rm.getConfig()+"----"+rm.getAlias());
+		 System.out.println(rm.getMapping()+"----"+rm.getSourceMapping());
+		 
+		 
 
 		return rm;
 	}
+	
+
 
 	public static void main(String args[])
 			throws JsonIOException, JsonSyntaxException, FileNotFoundException, ClassNotFoundException {

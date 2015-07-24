@@ -21,5 +21,10 @@ public class Couple<K, V> {
 	public void setValue(V value) {
 		this.value = value;
 	}
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return key.toString()+"---->"+value.toString();
+	}
 
 }

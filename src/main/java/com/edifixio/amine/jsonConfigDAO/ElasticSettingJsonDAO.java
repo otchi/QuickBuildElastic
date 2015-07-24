@@ -3,15 +3,14 @@ package com.edifixio.amine.jsonConfigDAO;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import com.edifixio.amine.config.ElasticSetting;
 import com.edifixio.amine.controller.Couple;
+import com.edifixio.amine.testBean.ElasticSetting;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
@@ -31,7 +30,7 @@ public class ElasticSettingJsonDAO extends ConfigJsonDAO<ElasticSetting>{
 		// TODO Auto-generated method stub
 	
 		ElasticSetting elasticSetting = new ElasticSetting();
-		Set<Couple<String, List<String>>>  indexes=elasticSetting.getConfig();
+		List<Couple<String, List<String>>>  indexes=elasticSetting.getConfig();
 		
 		Set<Entry<String, JsonElement>> jsonSet=jo.get("index")
 													.getAsJsonObject()

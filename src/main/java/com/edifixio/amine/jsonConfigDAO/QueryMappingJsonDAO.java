@@ -46,7 +46,7 @@ public class QueryMappingJsonDAO extends MappingJsonDAO<List<String>> {
 			qm.getConfig().add((new Couple<String, List<String>>(element.getKey(), list)));
 		
 		}
-		System.out.println("!!!!++++"+qm.getConfig()+"+++"+qm.getAlias()+"++!!!!+\n"+qm.getMapClass());
+		System.out.println("!!!!++++"+qm.getConfig()+"+++!!!!+\n"+qm.getMapClass());
 		return qm;
 
 		// TODO Auto-generated method stub

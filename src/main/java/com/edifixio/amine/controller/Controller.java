@@ -3,73 +3,180 @@ package com.edifixio.amine.controller;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
-import com.edifixio.amine.config.ElasticSetting;
 import com.edifixio.amine.config.QueryMapping;
 import com.edifixio.amine.config.ResponseMapping;
 import com.edifixio.amine.jsonConfigDAO.ElasticSettingJsonDAO;
 import com.edifixio.amine.jsonConfigDAO.QueryMappingJsonDAO;
 import com.edifixio.amine.jsonConfigDAO.ResponseMappingJsonDAO;
+import com.edifixio.amine.testBean.ElasticSetting;
 import com.edifixio.amine.testBean.MyRequest;
+import com.edifixio.jsonFastBuild.selector.UtilesSelector;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
+import io.searchbox.client.JestClient;
+import io.searchbox.core.Search;
+import io.searchbox.core.Search.Builder;
+
 public class Controller {
-	ElasticSetting elasticSetting; 
+	ElasticSetting elasticSetting;
 	QueryMapping queryMapping;
 	ResponseMapping responseMapping;
 	Object queryBean;
-	Map<String,Map<String,String>> facets;
+	Map<String, Map<String, String>> facets;
 	JsonObject query;
-	
-	public Controller(	ElasticSetting elasticSetting,
-						QueryMapping queryMapping,
-						ResponseMapping responseMapping,
-						Object queryBean,
-						Map<String,Map<String,String>> facets,
-						JsonObject query){
-		this.elasticSetting=elasticSetting;
-		this.queryMapping=queryMapping;
-		this.responseMapping=responseMapping;
-		this.queryBean=queryBean;
-		this.facets=facets;
-		this.query=query;
-		System.out.println("---------\n"+
-						query);
+	JsonObject response;
+
+	public Controller(ElasticSetting elasticSetting, QueryMapping queryMapping, 
+						ResponseMapping responseMapping,Object queryBean, 
+						Map<String, Map<String, String>> facets, JsonObject query) {
+		
+		this.elasticSetting = elasticSetting;
+		this.queryMapping = queryMapping;
+		this.responseMapping = responseMapping;
+		this.queryBean = queryBean;
+		this.facets = facets;
+		this.query = query;
+		System.out.println("---------\n" + query);
+	}
+
+	public void processingQuery() throws InstantiationException, IllegalAccessException, NoSuchMethodException,
+			SecurityException, IllegalArgumentException, InvocationTargetException {
+
+		Class<?> queryClass = queryMapping.getMapClass();
+		Object queryObject = queryBean;
+
+		List<Couple<String, List<String>>> mapping = queryMapping.getMapping();
+		Iterator<Couple<String, List<String>>> mapIter = mapping.iterator();
+
+		while (mapIter.hasNext()) {
+			Couple<String, List<String>> couple = mapIter.next();
+			Method m = queryClass
+					.getMethod("get" + 
+								couple.getKey()
+										.substring(0, 1)
+										.toUpperCase() +
+								couple.getKey().substring(1));
+
+			String value = (String) m.invoke(queryObject);
+
+			List<String> requestValue = couple.getValue();
+			Iterator<String> requestValueIter = requestValue.iterator();
+
+			while (requestValueIter.hasNext()) {
+
+				String request = requestValueIter.next();
+				int fieldIndex = request.lastIndexOf("::");
+				String path = request.substring(0, fieldIndex);
+				String field = request.substring(fieldIndex + 2);
+				
+				JsonObject jso = UtilesSelector.selection(path, query)
+												.getAsJsonObject();
+				jso.remove(field);
+				jso.addProperty(field, value);
+
+			}
+
+			System.out.println(query);
+			processingResponse();
+			try {
+				this.ConfigElasticClient();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 	
-	public void mapQuery(){
-		System.out.println(queryMapping.getMapClass()==queryBean.getClass());
-		Map<String, String> alias=queryMapping.getAlias();
-		Set<Couple<String, List<String>>> conf=queryMapping.getConfig();
-		System.out.println(alias.toString()+conf.toString());
+	public void ConfigElasticClient() throws IOException{
+		JestClient jestClient =ElasticClient.getElasticClient(elasticSetting.getHost()).getClient();
+		//elasticSetting.
+		System.out.println(query);
+		Builder build=new Search.Builder(query.toString());
+		List<Couple<String, List<String>>> listIndex=elasticSetting.getConfig();
+		Iterator<Couple<String, List<String>>> listIndexIterator=listIndex.iterator();
 		
-		//Set s;
-	//	s.i
-		
-		
+		while (listIndexIterator.hasNext()){
+			Couple<String, List<String>> index=listIndexIterator.next();
+			build.addIndex(index.getKey());
+			build.addType(index.getValue());
+		}
+
+		response=jestClient.execute(build.build()).getJsonObject();		
 	}
 	
-	
-	public static void main(String args[]) throws JsonIOException, JsonSyntaxException, FileNotFoundException, ClassNotFoundException{
+	public List<Object> processingResponse() throws InstantiationException, IllegalAccessException,
+													NoSuchMethodException, SecurityException, 
+													IllegalArgumentException, InvocationTargetException{
+		/*
+		Class<?> responseClass=responseMapping.getMapClass();
+		List<Object> responseObjects=new LinkedList<Object>();
+
+		List<Couple<String, String>> mapping = responseMapping.getMapping();
+		
+		Iterator<Couple<String, String>> mappingIter=mapping.iterator();
+		
+		while(mappingIter.hasNext()){
+			Couple<String, String> couple=mappingIter.next();
+			Object responseobject=responseClass.newInstance();
+			Method m=responseClass.getMethod("set"+
+									couple.getKey().substring(0, 1)
+											.toUpperCase() +
+									couple.getKey().substring(1), 
+									String.class);
+			//System.out.println(m.invoke(responseobject, 
+			//UtilesSelector.selection(couple.getValue(),this.response)
+					//	.getAsJsonObject().toString()));*/
+			//;
+			
+		//}
+		
+		return null;
+	}
+
+	public static void main(String args[])
+			throws JsonIOException, JsonSyntaxException, FileNotFoundException, ClassNotFoundException {
 		JsonParser jsonParser = new JsonParser();
 		JsonObject jo = jsonParser
 				.parse(new FileReader(
 						new File("/home/amine/workspace/" + "QuickBuildElastic/src/" + "resources/model.json")))
 				.getAsJsonObject();
-		new Controller(new ElasticSettingJsonDAO(jo).getMapping(),
-						new QueryMappingJsonDAO(jo).getMapping(),
-						new ResponseMappingJsonDAO(jo).getMapping(),
-						new MyRequest(),
-						null,
-						jo.get("_query").getAsJsonObject()).mapQuery();
-						
+		try {
+			new Controller(new ElasticSettingJsonDAO(jo).getMapping(), new QueryMappingJsonDAO(jo).getMapping(),
+					new ResponseMappingJsonDAO(jo).getMapping(), new MyRequest(), null,
+					jo.get("_query").getAsJsonObject())
+			.processingQuery();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		// new QueryMappingJsonDAO(jo).getMapping().getCorresp();
+
 	}
 
 }

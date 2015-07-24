@@ -1,7 +1,9 @@
-package com.edifixio.amine.config;
+package com.edifixio.amine.testBean;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import com.edifixio.amine.config.Config;
 
 public class ElasticSetting extends Config<List<String>>{
 	

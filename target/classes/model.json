@@ -2,32 +2,33 @@
         _mapping:{  
             host:"http://localhost:9200",
             index:{
-                    "index1":["type1"]
+                    "vehicule":["voiture"]
                 },
             
             request:{
                 class:"com.edifixio.amine.testBean.MyRequest",
                 alias:{
-                    query:"query::filtred::query",
-                    voiture:"$$query::term::voiture::values"
+                    query:"query::filtered::query",
+                    voiture:"$$query::term::voiture"
                 },
                 mapping:{
-                    voiture:["mainSearch"]
+                    mainSearch:["$$voiture::value"]
                         }
             },
             
             response:{
                 class:"com.edifixio.amine.testBean.MyResponse",
                 alias:{
-                    response:"hits::hits::_source",
-                    voiture:"$$response::voiture"
+                    response:"hits::hits::_source"
                 },
                 mapping:{
-                    voiture:"voiture"
+                    voiture:"$$response::voiture"
+                },
+                 _source:{
+                       $$proprety:""
                 }
             },
-            facets:[ "test"
-            ]
+             facets:[ "test"]
         },
         
         
@@ -42,9 +43,7 @@
                         }
                     },
                     "filter":{
-                        "term": {
-                            "cylendres": "??"
-                            }
+                 
                         }
                     }
                 }
