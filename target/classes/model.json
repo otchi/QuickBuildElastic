@@ -19,8 +19,8 @@
             response:{
                 _meta:{
                     class:"com.edifixio.amine.testBean.MyResponse",
-                    alias:{},
-                    mapping:{}
+                    alias:{tt:"lala"},
+                    mapping:{mainSearch:"$$voiture::value"}
                 },
                  _source:{
                        $$class:""

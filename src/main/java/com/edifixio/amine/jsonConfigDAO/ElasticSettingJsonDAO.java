@@ -7,10 +7,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.Set;
 
-import com.edifixio.amine.controller.Couple;
-import com.edifixio.amine.testBean.ElasticSetting;
+import com.edifixio.amine.config.ElasticSetting;
+import com.edifixio.amine.config.Mapping;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
@@ -18,7 +19,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
-public class ElasticSettingJsonDAO extends ConfigJsonDAO<ElasticSetting>{
+public class ElasticSettingJsonDAO extends ConfigJsonDAO<Mapping>{
 
 	public ElasticSettingJsonDAO(JsonObject jo) {
 		super(jo.get("_mapping").getAsJsonObject());
@@ -30,7 +31,7 @@ public class ElasticSettingJsonDAO extends ConfigJsonDAO<ElasticSetting>{
 		// TODO Auto-generated method stub
 	
 		ElasticSetting elasticSetting = new ElasticSetting();
-		List<Couple<String, List<String>>>  indexes=elasticSetting.getConfig();
+		Properties  indexes=elasticSetting.getConfig();
 		
 		Set<Entry<String, JsonElement>> jsonSet=jo.get("index")
 													.getAsJsonObject()
@@ -45,7 +46,7 @@ public class ElasticSettingJsonDAO extends ConfigJsonDAO<ElasticSetting>{
 			for(int i=0;i<jsa.size();i++){
 				listeOfType.add(jsa.get(i).getAsString());
 			}
-			indexes.add(new Couple<String, List<String>>(index.getKey(), listeOfType));
+			indexes.put(index.getKey(), listeOfType);
 			
 		}
 		

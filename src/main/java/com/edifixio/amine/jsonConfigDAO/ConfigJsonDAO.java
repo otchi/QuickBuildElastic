@@ -1,9 +1,9 @@
 package com.edifixio.amine.jsonConfigDAO;
 
-import com.edifixio.amine.config.Config;
+import com.edifixio.amine.config.Mapping;
 import com.google.gson.JsonObject;
 
-public abstract class ConfigJsonDAO <Type extends Config<?>> {
+public abstract class ConfigJsonDAO <Type extends Mapping> {
 	
 	protected JsonObject jo;
 

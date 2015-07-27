@@ -9,13 +9,15 @@ import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
 
+import com.edifixio.amine.config.ElasticSetting;
 import com.edifixio.amine.config.QueryMapping;
 import com.edifixio.amine.config.ResponseMapping;
 import com.edifixio.amine.jsonConfigDAO.ElasticSettingJsonDAO;
 import com.edifixio.amine.jsonConfigDAO.QueryMappingJsonDAO;
 import com.edifixio.amine.jsonConfigDAO.ResponseMappingJsonDAO;
-import com.edifixio.amine.testBean.ElasticSetting;
 import com.edifixio.amine.testBean.MyRequest;
 import com.edifixio.jsonFastBuild.selector.UtilesSelector;
 import com.google.gson.JsonIOException;
@@ -55,21 +57,22 @@ public class Controller {
 		Class<?> queryClass = queryMapping.getMapClass();
 		Object queryObject = queryBean;
 
-		List<Couple<String, List<String>>> mapping = queryMapping.getMapping();
-		Iterator<Couple<String, List<String>>> mapIter = mapping.iterator();
+		Properties mapping = queryMapping.getMapping();
+		Iterator<Entry<Object, Object>> mapIter = mapping.entrySet().iterator();
 
 		while (mapIter.hasNext()) {
-			Couple<String, List<String>> couple = mapIter.next();
+			Entry<Object, Object> couple = mapIter.next();
 			Method m = queryClass
 					.getMethod("get" + 
-								couple.getKey()
+								((String)couple.getKey())
 										.substring(0, 1)
 										.toUpperCase() +
-								couple.getKey().substring(1));
+								((String)couple.getKey()).substring(1));
 
 			String value = (String) m.invoke(queryObject);
 
-			List<String> requestValue = couple.getValue();
+			@SuppressWarnings("unchecked")
+			List<String> requestValue = (List<String>) couple.getValue();
 			Iterator<String> requestValueIter = requestValue.iterator();
 
 			while (requestValueIter.hasNext()) {
@@ -97,18 +100,19 @@ public class Controller {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void ConfigElasticClient() throws IOException{
 		JestClient jestClient =ElasticClient.getElasticClient(elasticSetting.getHost()).getClient();
 		//elasticSetting.
 		System.out.println(query);
 		Builder build=new Search.Builder(query.toString());
-		List<Couple<String, List<String>>> listIndex=elasticSetting.getConfig();
-		Iterator<Couple<String, List<String>>> listIndexIterator=listIndex.iterator();
+		Properties listIndex=elasticSetting.getConfig();
+		Iterator<Entry<Object, Object>> listIndexIterator=listIndex.entrySet().iterator();
 		
 		while (listIndexIterator.hasNext()){
-			Couple<String, List<String>> index=listIndexIterator.next();
-			build.addIndex(index.getKey());
-			build.addType(index.getValue());
+			Entry<Object, Object> index=listIndexIterator.next();
+			build.addIndex((String) index.getKey());
+			build.addType((List<String>) index.getValue());
 		}
 
 		response=jestClient.execute(build.build()).getJsonObject();		

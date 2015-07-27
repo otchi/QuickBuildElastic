@@ -1,11 +1,9 @@
-package com.edifixio.amine.testBean;
+package com.edifixio.amine.config;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import com.edifixio.amine.config.Config;
-
-public class ElasticSetting extends Config<List<String>>{
+public class ElasticSetting extends Mapping{
 	
 	private String host;
 	private List<String> facets=new LinkedList<String>();

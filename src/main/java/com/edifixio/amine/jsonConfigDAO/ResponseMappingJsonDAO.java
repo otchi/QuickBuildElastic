@@ -7,8 +7,8 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import com.edifixio.amine.config.MappingClassAlias;
 import com.edifixio.amine.config.ResponseMapping;
-import com.edifixio.amine.controller.Couple;
 import com.edifixio.jsonFastBuild.selector.UtilesSelector;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
@@ -17,10 +17,10 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
 public class ResponseMappingJsonDAO extends MappingJsonDAO<String>{
-
+	public final static  String RESPONSE_SELECTOR = "_mapping::response";
 
 	public ResponseMappingJsonDAO(JsonObject jo) {
-		super(UtilesSelector.selection("_mapping::response", jo).getAsJsonObject());
+		super(UtilesSelector.selection(RESPONSE_SELECTOR, jo).getAsJsonObject());
 		// TODO Auto-generated constructor stub
 	
 	}
@@ -28,16 +28,16 @@ public class ResponseMappingJsonDAO extends MappingJsonDAO<String>{
 	@Override
 	public ResponseMapping getMapping() throws ClassNotFoundException {
 		// TODO Auto-generated method stub
-		Set<Entry<String, JsonElement>> mapping = jo.get("mapping")
+		Set<Entry<String, JsonElement>> mapping = jo.get("_meta")
 												.getAsJsonObject().entrySet();
 		//System.out.println();
 		Iterator<Entry<String, JsonElement>> mappingIter = mapping.iterator();
 		ResponseMapping rm=new ResponseMapping();	
-		rm.setAlias(super.getMapping().getAlias());
-		rm.setMapClass(super.getMapping().getMapClass());
+		rm.setAlias(((MappingClassAlias)super.getMapping()).getAlias());
+		rm.setMapClass(((MappingClassAlias)super.getMapping()).getMapClass());
 		while (mappingIter.hasNext()) {
 			Entry<String, JsonElement> element = mappingIter.next();
-			rm.getConfig().add(new Couple<String, String>(element.getKey(), element.getValue().getAsString()));
+			rm.getConfig().put(element.getKey(), element.getValue().getAsString());
 		}
 		
 		Set<Entry<String, JsonElement>> source= jo.get("_source")
@@ -45,8 +45,8 @@ public class ResponseMappingJsonDAO extends MappingJsonDAO<String>{
 		Iterator<Entry<String, JsonElement>> sourceIter = source.iterator();
 		while(sourceIter.hasNext()){
 			Entry<String, JsonElement> element=sourceIter.next();
-			rm.getSourceMapping().add(new Couple<String, String>(element.getKey(),
-										element.getValue().getAsString()));
+			rm.getSourceMapping().put(element.getKey(),
+										element.getValue().getAsString());
 		}
 		
 

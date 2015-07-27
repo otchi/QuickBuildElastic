@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import com.edifixio.amine.config.MappingClassAlias;
 import com.edifixio.amine.config.QueryMapping;
-import com.edifixio.amine.controller.Couple;
 import com.edifixio.jsonFastBuild.selector.UtilesSelector;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -32,8 +32,8 @@ public class QueryMappingJsonDAO extends MappingJsonDAO<List<String>> {
 		// System.out.println();
 		Iterator<Entry<String, JsonElement>> mappingIter = mapping.iterator();
 		QueryMapping qm = new QueryMapping();
-		qm.setAlias(super.getMapping().getAlias());
-		qm.setMapClass(super.getMapping().getMapClass());
+		qm.setAlias(((MappingClassAlias)super.getMapping()).getAlias());
+		qm.setMapClass(((MappingClassAlias)super.getMapping()).getMapClass());
 		while (mappingIter.hasNext()) {
 			Entry<String, JsonElement> element = mappingIter.next();
 			List<String> list=new ArrayList<String>();
@@ -43,7 +43,7 @@ public class QueryMappingJsonDAO extends MappingJsonDAO<List<String>> {
 				list.add(jsonArray.get(i).getAsString());
 			}
 			
-			qm.getConfig().add((new Couple<String, List<String>>(element.getKey(), list)));
+			qm.getConfig().put(element.getKey(), list);
 		
 		}
 		System.out.println("!!!!++++"+qm.getConfig()+"+++!!!!+\n"+qm.getMapClass());

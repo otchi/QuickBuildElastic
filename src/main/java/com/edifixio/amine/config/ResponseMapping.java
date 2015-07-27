@@ -3,37 +3,38 @@ package com.edifixio.amine.config;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.Properties;
 
-import com.edifixio.amine.controller.Couple;
 import com.edifixio.amine.jsonConfigDAO.ResponseMappingJsonDAO;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-public class ResponseMapping extends Mapping<String>{
-	private List<Couple<String, String>> sourceMapping=new LinkedList<Couple<String,String>>();
+public class ResponseMapping extends MappingClassAlias{
+	private Properties sourceMapping=new Properties();
 	
 	
-	public List<Couple<String, String>> getSourceMapping() {
+	public Properties getSourceMapping() {
 		return sourceMapping;
+		
 	}
 
-	public void setSourceMapping(List<Couple<String, String>>sourceMapping) {
+	public void setSourceMapping(Properties sourceMapping) {
 		this.sourceMapping = sourceMapping;
 	}
 
 	@Override
-	public List<Couple<String,String>> getMapping() {
+	public Properties getMapping() {
 		// TODO Auto-generated method stub
-			List<Couple<String,String>> corresp=new LinkedList<Couple<String,String>>();
-			for(int i=0;i<config.size();i++){
-				Couple<String,String> conf=config.get(i);
-					corresp.add(
-							new Couple<String, String>(
-									conf.getKey(),
-									searchInResolvedAlis(conf.getValue())));
-				}
+		Properties corresp=new Properties();
+		Iterator<Entry<Object, Object>> configIter=config.entrySet().iterator();
+		
+		while (configIter.hasNext()) {
+			Entry<Object, Object> entry =  configIter.next();
+			corresp.put(entry.getKey(), searchInResolvedAlis((String)entry.getValue()));
+		}
+			
 			
 			return corresp;
 	}

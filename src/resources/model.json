@@ -1,11 +1,11 @@
     {
-        _mapping:{  
-            host:"http://localhost:9200",
-            index:{
+        _config:{  
+            _host:"http://localhost:9200",
+            _index:{
                     "vehicule":["voiture"]
                 },
             
-            request:{
+            _request:{
                 class:"com.edifixio.amine.testBean.MyRequest",
                 alias:{
                     query:"query::filtered::query",
@@ -16,17 +16,18 @@
                         }
             },
             
-            response:{
-                _meta:{
+            
+            _meta_response:{
                     class:"com.edifixio.amine.testBean.MyResponse",
-                    alias:{},
-                    mapping:{}
-                },
-                 _source:{
-                       $$class:""
-                }
+                    alias:{tt:"lala"},
+                    mapping:{mainSearch:"$$voiture::value"}
             },
-             facets:[ "test"]
+            _response:{
+                    class:"gg",mapping:{
+                    mainSearch:"value"}
+                }
+            ,
+            _facets:[ "test"]
         },
         
         
